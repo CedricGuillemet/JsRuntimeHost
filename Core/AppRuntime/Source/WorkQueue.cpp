@@ -46,7 +46,7 @@ namespace Babylon
 
     void WorkQueue::Dispatch(Dispatchable<void(Napi::Env)> func)
     {
-        Append([this, func{ std::move(func) }](Napi::Env env) mutable {
+        Append([/*this,*/ func{ std::move(func) }](Napi::Env env) mutable {
             /*Execute([this, env, func{std::move(func)}]() mutable {*/
                 try
                 {
