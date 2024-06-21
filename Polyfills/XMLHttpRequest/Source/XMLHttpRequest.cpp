@@ -256,7 +256,7 @@ namespace Babylon::Polyfills::Internal
 
         m_request.SendAsync()
             .then(m_runtimeScheduler.Get(), m_cancellationSource,
-                [this, thisRef = Napi::Persistent(info.This())](arcana::expected<void, std::exception_ptr> result) {
+                [this, thisRef = Napi::Persistent(info.This())](arcana::expected<void, std::exception_ptr> /*result*/) {
                     SetReadyState(ReadyState::Done);
                     RaiseEvent(EventType::LoadEnd);
 
