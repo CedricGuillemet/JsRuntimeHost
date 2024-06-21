@@ -1,4 +1,5 @@
 #include "WorkQueue.h"
+#include <Babylon/JsRuntime.h>
 
 namespace Babylon
 {
@@ -13,8 +14,17 @@ namespace Babylon
         {
             Resume();
         }
+        Dispatch([this](Napi::Env env) {
+            // Notify the JsRuntime on the JavaScript thread that the JavaScript runtime shutdown sequence has
+            // begun. The JsRuntimeScheduler will use this signal to gracefully cancel asynchronous operations.
+            JsRuntime::NotifyDisposing(JsRuntime::GetFromJavaScript(env));
 
-        m_cancelSource.cancel();
+            // Cancel on the JavaScript thread to signal the Run function to gracefully end. It must be
+            // dispatched and not canceled directly to ensure that existing work is executed and executed in
+            // the correct order.
+            m_cancellationSource.cancel();
+            });
+
         m_dispatcher.cancelled();
 
         m_thread.join();
@@ -34,14 +44,34 @@ namespace Babylon
         m_suspensionLock.reset();
     }
 
+    void WorkQueue::Dispatch(Dispatchable<void(Napi::Env)> func)
+    {
+        Append([this, func{ std::move(func) }](Napi::Env env) mutable {
+            /*Execute([this, env, func{std::move(func)}]() mutable {*/
+                try
+                {
+                    func(env);
+                }
+                /*catch (const std::exception& error)
+                {
+                    m_unhandledExceptionHandler(error);
+                }*/
+                catch (...)
+                {
+                    std::abort();
+                }
+            //});
+        });
+    }
+
     void WorkQueue::Run(Napi::Env env)
     {
         m_env = std::make_optional(env);
         m_dispatcher.set_affinity(std::this_thread::get_id());
 
-        while (!m_cancelSource.cancelled())
+        while (!m_cancellationSource.cancelled())
         {
-            m_dispatcher.blocking_tick(m_cancelSource);
+            m_dispatcher.blocking_tick(m_cancellationSource);
         }
 
         m_dispatcher.clear();

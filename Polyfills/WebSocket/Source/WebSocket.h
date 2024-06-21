@@ -54,6 +54,6 @@ namespace Babylon::Polyfills::Internal
         const std::string m_url{};
         ReadyState m_readyState{ReadyState::Connecting};
 
-        std::shared_ptr<arcana::cancellation_source> m_cancellationSource{};
+        arcana::cancellation_source m_cancellationSource{};
     };
 }

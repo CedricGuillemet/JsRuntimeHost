@@ -45,6 +45,7 @@ namespace Babylon::Polyfills::Internal
         void RaiseEvent(const char* eventType);
 
         UrlLib::UrlRequest m_request{};
+        arcana::cancellation_source m_cancellationSource;
         JsRuntimeScheduler m_runtimeScheduler;
         ReadyState m_readyState{ReadyState::Unsent};
         std::unordered_map<std::string, std::vector<Napi::FunctionReference>> m_eventHandlerRefs;

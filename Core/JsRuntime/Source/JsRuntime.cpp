@@ -1,5 +1,5 @@
 #include "JsRuntime.h"
-#include "Babylon/DebugTrace.h"
+#include <cassert>
 
 namespace Babylon
 {
@@ -24,8 +24,6 @@ namespace Babylon
 
         Napi::Value jsRuntime = Napi::External<JsRuntime>::New(env, this, [](Napi::Env, JsRuntime* runtime) { delete runtime; });
         jsNative.Set(JS_RUNTIME_NAME, jsRuntime);
-
-        DEBUG_TRACE("JsRuntime created");
     }
 
     JsRuntime& BABYLON_API JsRuntime::CreateForJavaScript(Napi::Env env, DispatchFunctionT dispatchFunction)
@@ -58,5 +56,31 @@ namespace Babylon
                 throw env.GetAndClearPendingException();
             }
         });
+    }
+
+    void JsRuntime::NotifyDisposing(JsRuntime& runtime)
+    {
+        auto callbacks = std::move(runtime.m_disposingCallbacks);
+        for (auto* callback : callbacks)
+        {
+            callback->Disposing();
+        }
+    }
+
+    void JsRuntime::RegisterDisposing(JsRuntime& runtime, IDisposingCallback* callback)
+    {
+        auto& callbacks = runtime.m_disposingCallbacks;
+        assert(std::find(callbacks.begin(), callbacks.end(), callback) == callbacks.end());
+        callbacks.push_back(callback);
+    }
+
+    void JsRuntime::UnregisterDisposing(JsRuntime& runtime, IDisposingCallback* callback)
+    {
+        auto& callbacks = runtime.m_disposingCallbacks;
+        auto it = std::find(callbacks.begin(), callbacks.end(), callback);
+        if (it != callbacks.end())
+        {
+            callbacks.erase(it);
+        }
     }
 }

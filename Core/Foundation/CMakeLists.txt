@@ -1,9 +1,7 @@
 set(SOURCES
-    "Include/Babylon/Api.h"
-    "Include/Babylon/DebugTrace.h"
-    "Source/DebugTrace.cpp")
+    "Include/Babylon/Api.h")
 
-add_library(Foundation ${SOURCES})
+add_library(Foundation INTERFACE)
 
 target_include_directories(Foundation INTERFACE "Include")
 

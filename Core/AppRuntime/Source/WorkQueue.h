@@ -7,6 +7,7 @@
 #include <future>
 #include <functional>
 #include <exception>
+#include "Dispatchable.h"
 
 namespace Babylon
 {
@@ -46,11 +47,13 @@ namespace Babylon
             callable(m_env.value());
         }
 
+        void Dispatch(Dispatchable<void(Napi::Env)> func);
+
         std::optional<Napi::Env> m_env{};
 
         std::optional<std::scoped_lock<std::mutex>> m_suspensionLock{};
 
-        arcana::cancellation_source m_cancelSource{};
+        arcana::cancellation_source m_cancellationSource{};
         arcana::manual_dispatcher<128> m_dispatcher{};
 
         std::thread m_thread;

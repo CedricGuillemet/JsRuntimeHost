@@ -13,7 +13,7 @@ target_link_libraries(JsRuntime
     PUBLIC Foundation
     PUBLIC napi
     PUBLIC napi-extensions
-    PRIVATE arcana)
+    PUBLIC arcana) # arcana public because of #include dispatcher.h in JsRuntimeScheduler.h
 
 set_property(TARGET JsRuntime PROPERTY FOLDER Core)
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCES})
