@@ -8,13 +8,13 @@
 #include <functional>
 #include <exception>
 #include "Dispatchable.h"
-
+#include "AppRuntime.h"
 namespace Babylon
 {
     class WorkQueue
     {
     public:
-        WorkQueue(std::function<void()> threadProcedure);
+        WorkQueue(std::function<void()> threadProcedure, AppRuntime& runtime);
         ~WorkQueue();
 
         template<typename CallableT>
@@ -47,8 +47,6 @@ namespace Babylon
             callable(m_env.value());
         }
 
-        void Dispatch(Dispatchable<void(Napi::Env)> func);
-
         std::optional<Napi::Env> m_env{};
 
         std::optional<std::scoped_lock<std::mutex>> m_suspensionLock{};
@@ -57,5 +55,6 @@ namespace Babylon
         arcana::manual_dispatcher<128> m_dispatcher{};
 
         std::thread m_thread;
+        AppRuntime& m_runtime;
     };
 }

@@ -10,7 +10,7 @@ namespace Babylon
     }
 
     AppRuntime::AppRuntime(Options options)
-        : m_workQueue{std::make_unique<WorkQueue>([this] { RunPlatformTier(); })}
+        : m_workQueue{std::make_unique<WorkQueue>([this] { RunPlatformTier(); }, *this)}
         , m_options{std::move(options)}
     {
         Dispatch([this](Napi::Env env) {
