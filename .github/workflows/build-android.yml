@@ -39,7 +39,7 @@ jobs:
             chmod +x gradlew
             ./gradlew connectedAndroidTest \
               -PabiFilters=x86_64 \
-              -PjsEngine=${{ inputs['js-engine'] }} \
+              -PjsEngine=${{ inputs.js-engine }} \
               -PndkVersion=${{ env.NDK_VERSION }}
 
       - name: Dump Test Results
@@ -55,6 +55,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: AndroidTestResults_${{ inputs['js-engine'] }}
+          name: AndroidTestResults_${{ inputs.js-engine }}
           path: Tests/UnitTests/Android/app/build/outputs/androidTest-results/connected
           if-no-files-found: ignore
